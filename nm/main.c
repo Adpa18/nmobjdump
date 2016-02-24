@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Wed Feb 17 00:48:10 2016 Adrien WERY
-** Last update	Mon Feb 22 21:52:41 2016 Adrien WERY
+** Last update	Wed Feb 24 23:14:14 2016 Adrien WERY
 */
 
 #include <stdio.h>
@@ -17,7 +17,7 @@ void    display(char *s)
 
     if (!(initElf(&elf, s)))
         return;
-    getSym64(&elf);
+    display64(&elf);
     closeFile(&elf);
 }
 
@@ -26,6 +26,7 @@ int     main(int ac, char **av)
     size_t  i;
 
     i = 0;
+    setlocale(LC_COLLATE, "fr_FR.utf8");
     while (++i < (size_t)ac)
     {
         if (ac > 2)

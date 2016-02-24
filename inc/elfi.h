@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Wed Feb 17 01:19:21 2016 Adrien WERY
-** Last update	Mon Feb 22 23:08:01 2016 Adrien WERY
+** Last update	Wed Feb 24 22:33:06 2016 Adrien WERY
 */
 
 #ifndef ELFI_H
@@ -19,6 +19,7 @@
 # include <sys/mman.h>
 # include <sys/stat.h>
 # include <stdio.h>
+# include <locale.h>
 
 # define DUMPSYM64 "%016lx %c %s\n"
 # define DUMPSYM32 "%08x %c %s\n"
@@ -41,15 +42,19 @@ typedef struct  s_elf
     size_t      symSize;
     char        type;
     void        *data;
-    void        *Ehdr;
-    void        *Shdr;
-    char        *strtab;
 }               t_elf;
+
+typedef struct  s_sym
+{
+    char        *name;
+    Elf64_Addr  value;
+    char        type;
+}               t_sym;
 
 bool    initElf(t_elf *elf, char *name);
 void    closeFile(t_elf *file);
 bool    getFile(t_elf *file, char *name);
-void    getSym64(t_elf *elf);
+void    display64(t_elf *elf);
 char    *getSymName(t_elf *elf, int pos, char *symstr);
 int     strcmpcase_espace(char *s1, char *s2, char esc);
 

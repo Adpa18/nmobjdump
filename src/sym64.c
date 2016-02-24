@@ -5,77 +5,87 @@
 ** Login	wery_a
 **
 ** Started on	Mon Feb 22 21:47:49 2016 Adrien WERY
-** Last update	Mon Feb 22 23:16:34 2016 Adrien WERY
+** Last update	Wed Feb 24 23:17:02 2016 Adrien WERY
 */
 
 #include "elfi.h"
 
-void    sortSym64(t_elf *elf, Elf64_Sym **syms, char *symstr)
+char    *to_lower(const char *s1)
 {
-    int     i;
-    bool    ok;
-    char	*s1;
-    char	*s2;
-    Elf64_Sym   *tmp;
+  char      *dest;
+  size_t    i;
+  size_t    size;
 
-    ok = true;
-    while (ok)
+  i = 0;
+  size = strlen(s1);
+  if (!(dest = malloc(sizeof(char) * size)))
+    return (NULL);
+  while (i  < size)
+  {
+      dest[i] = LOWER(s1[i]);
+      ++i;
+  }
+  return (dest);
+}
+
+int     compare(const void *s1, const void *s2)
+{
+    int     ret;
+
+    char *ss1 = to_lower(((t_sym *)(s1))->name);
+    char *ss2 = to_lower(((t_sym *)(s2))->name);
+    ret = strcoll(ss1, ss2);
+    free(ss1);
+    free(ss2);
+  return (ret);
+}
+
+void    dumpSym64(t_sym *syms, size_t nb_syms)
+{
+    size_t  i;
+
+    i = 0;
+    qsort(syms, nb_syms, sizeof(t_sym), compare);
+    while (i < nb_syms)
     {
-        ok = false;
-        i = 1;
-        while (syms[i])
-        {
-            s1 = getSymName(elf, syms[i - 1]->st_name, symstr);
-            s2 = getSymName(elf, syms[i]->st_name, symstr);
-            if (strcmpcase_espace(s1, s2, '_') > 0)
-            {
-                tmp = syms[i - 1];
-                syms[i - 1] = syms[i];
-                syms[i] = tmp;
-                ok = true;
-            }
-            i++;
-        }
+        if (syms[i].value)
+            printf(DUMPSYM64, syms[i].value, syms[i].type, syms[i].name);
+        else
+            printf(DUMPSYMNS64, syms[i].type, syms[i].name);
+        ++i;
     }
 }
 
-void    dumpSym64(t_elf *elf, Elf64_Sym *sym, char *symstr)
+void    displaySym64(size_t syms_ptr, void *ptr, size_t max)
 {
-    char    type = '?';
-
-    if (OVER(symstr + sym->st_name) || symstr[sym->st_name] == '\0'
-        || sym->st_info == STT_NOTYPE || sym->st_info == STT_FILE)
-        return;
-    if (sym->st_value)
-        printf(DUMPSYM64, sym->st_value, type, getSymName(elf, sym->st_name, symstr));
-    else
-        printf(DUMPSYMNS64, type, getSymName(elf, sym->st_name, symstr));
-
-}
-
-void    displaySym64(t_elf *elf, void *ptr, char *symstr)
-{
+    Elf64_Sym   *symbol;
+    t_sym       syms[max];
+    char        *name;
     size_t      i;
-    Elf64_Sym   **syms;
+    size_t      nb_syms;
 
+    nb_syms = 0;
     i = 0;
-    if (!(syms = malloc((elf->size / elf->symSize + 1) * sizeof(void*))))
-        return;
-    while (elf->symSize * i < elf->size)
+    while (i < max)
     {
-        syms[i] = (Elf64_Sym*)(ptr + (elf->symSize * i));
-        i++;
+        symbol = &((Elf64_Sym *)(syms_ptr))[i];
+        name = (char *)ptr + symbol->st_name;
+        if (symbol->st_shndx != SHN_ABS && name[0] != '\0')
+        {
+            syms[nb_syms].name = name;
+            syms[nb_syms].type = '?';
+            if (symbol->st_shndx == SHN_UNDEF)
+                syms[nb_syms].value = 0;
+            else
+                syms[nb_syms].value = symbol->st_value;
+            ++nb_syms;
+        }
+        ++i;
     }
-    syms[i] = NULL;
-    sortSym64(elf, syms, symstr);
-    i = 0;
-    while (syms[i])
-        dumpSym64(elf, syms[i++], symstr);
-    free(syms);
-
+    dumpSym64(syms, nb_syms);
 }
 
-void    getSym64(t_elf *elf)
+void    display64(t_elf *elf)
 {
     Elf64_Ehdr  *Ehdr;
     Elf64_Shdr  *Shdr;
@@ -88,8 +98,10 @@ void    getSym64(t_elf *elf)
     {
         if (Shdr[i].sh_type == SHT_SYMTAB)
         {
-            displaySym64(elf, elf->data + Shdr[i].sh_offset,
-                    elf->data + Shdr[Shdr[i].sh_link].sh_offset);
+            displaySym64((size_t)elf->data + Shdr[i].sh_offset,
+                    elf->data + Shdr[Shdr[i].sh_link].sh_offset,
+                    Shdr[i].sh_size / Shdr[i].sh_entsize);
+
         }
         ++i;
     }
