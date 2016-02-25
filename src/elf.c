@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Wed Feb 17 16:15:24 2016 Adrien WERY
-** Last update	Thu Feb 25 11:18:07 2016 Adrien WERY
+** Last update	Thu Feb 25 13:41:10 2016 Adrien WERY
 */
 
 #include "elfi.h"
@@ -66,4 +66,28 @@ int     compare(const void *s1, const void *s2)
     free(ss1);
     free(ss2);
   return (ret);
+}
+
+char    getType(char *name)
+{
+    R_CUSTOM(!strncmp(name, ".bss", 4), 'b');
+    R_CUSTOM(!strncmp(name, "code", 4), 't');
+    R_CUSTOM(!strncmp(name, ".data", 5), 'd');
+    R_CUSTOM(!strncmp(name, "*DEBUG*", 7), 'N');
+    R_CUSTOM(!strncmp(name, ".debug", 6), 'N');
+    R_CUSTOM(!strncmp(name, ".drectve", 8), 'i');
+    R_CUSTOM(!strncmp(name, ".edata", 6), 'e');
+    R_CUSTOM(!strncmp(name, ".fini", 5), 't');
+    R_CUSTOM(!strncmp(name, ".idata", 6), 'i');
+    R_CUSTOM(!strncmp(name, ".init", 5), 't');
+    R_CUSTOM(!strncmp(name, ".pdata", 6), 'p');
+    R_CUSTOM(!strncmp(name, ".rdata", 6), 'r');
+    R_CUSTOM(!strncmp(name, ".rodata", 7), 'r');
+    R_CUSTOM(!strncmp(name, ".sbss", 5), 's');
+    R_CUSTOM(!strncmp(name, ".scommon", 8), 'c');
+    R_CUSTOM(!strncmp(name, ".sdata", 6), 'g');
+    R_CUSTOM(!strncmp(name, ".text", 5), 't');
+    R_CUSTOM(!strncmp(name, "vars", 4), 'd');
+    R_CUSTOM(!strncmp(name, "zerovars", 8), 'b');
+    return ('?');
 }

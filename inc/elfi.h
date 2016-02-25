@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Wed Feb 17 01:19:21 2016 Adrien WERY
-** Last update	Thu Feb 25 12:01:11 2016 Adrien WERY
+** Last update	Thu Feb 25 13:41:08 2016 Adrien WERY
 */
 
 #ifndef ELFI_H
@@ -55,5 +55,6 @@ bool    getFile(t_elf *file, char *name);
 void    display64(t_elf *elf);
 void    display32(t_elf *elf);
 int     compare(const void *s1, const void *s2);
+char    getType(char *name);
 
 #endif /* !ELFI_H */

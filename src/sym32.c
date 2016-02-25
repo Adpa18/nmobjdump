@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Mon Feb 22 21:47:49 2016 Adrien WERY
-** Last update	Thu Feb 25 13:32:01 2016 Adrien WERY
+** Last update	Thu Feb 25 13:41:18 2016 Adrien WERY
 */
 
 #include "elfi.h"
@@ -24,26 +24,7 @@ char    getSectionType32(Elf32_Shdr *st, char *name)
     R_CUSTOM(st->sh_type == SHT_NULL && st->sh_type == SHT_ALPHA_DEBUG, 'N');
     R_CUSTOM(st->sh_type != SHT_NOBITS && st->sh_type == SHT_PROGBITS &&
       !(st->sh_flags & SHF_WRITE), 'n');
-    R_CUSTOM(!strncmp(name, ".bss", 4), 'b');
-    R_CUSTOM(!strncmp(name, "code", 4), 't');
-    R_CUSTOM(!strncmp(name, ".data", 5), 'd');
-    R_CUSTOM(!strncmp(name, "*DEBUG*", 7), 'N');
-    R_CUSTOM(!strncmp(name, ".debug", 6), 'N');
-    R_CUSTOM(!strncmp(name, ".drectve", 8), 'i');
-    R_CUSTOM(!strncmp(name, ".edata", 6), 'e');
-    R_CUSTOM(!strncmp(name, ".fini", 5), 't');
-    R_CUSTOM(!strncmp(name, ".idata", 6), 'i');
-    R_CUSTOM(!strncmp(name, ".init", 5), 't');
-    R_CUSTOM(!strncmp(name, ".pdata", 6), 'p');
-    R_CUSTOM(!strncmp(name, ".rdata", 6), 'r');
-    R_CUSTOM(!strncmp(name, ".rodata", 7), 'r');
-    R_CUSTOM(!strncmp(name, ".sbss", 5), 's');
-    R_CUSTOM(!strncmp(name, ".scommon", 8), 'c');
-    R_CUSTOM(!strncmp(name, ".sdata", 6), 'g');
-    R_CUSTOM(!strncmp(name, ".text", 5), 't');
-    R_CUSTOM(!strncmp(name, "vars", 4), 'd');
-    R_CUSTOM(!strncmp(name, "zerovars", 8), 'b');
-    return ('?');
+    return (getType(name));
 }
 
 char    getSymType32(Elf32_Sym *sym)
@@ -99,7 +80,8 @@ void    displaySym32(t_elf *elf, size_t max, size_t syms_ptr, void *ptr)
             syms[nb_syms].name = name;
             syms[nb_syms].value = (sym->st_shndx == SHN_UNDEF)?0:sym->st_value;
             if ((syms[nb_syms].type = getSymType32(sym)) == '?')
-                syms[nb_syms].type = GLOBAL(getSectionType32(&G_SHDR32[sym->st_shndx],
+                syms[nb_syms].type = GLOBAL(getSectionType32(
+                        &G_SHDR32[sym->st_shndx],
                         &elf->shstrtab[G_SHDR32[sym->st_shndx].sh_name]));
             ++nb_syms;
         }
