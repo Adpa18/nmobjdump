@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Mon Feb 22 21:47:49 2016 Adrien WERY
-** Last update	Thu Feb 25 13:54:51 2016 Adrien WERY
+** Last update	Thu Feb 25 13:59:16 2016 Adrien WERY
 */
 
 #include "elfi.h"
@@ -65,12 +65,12 @@ void    displaySym64(t_elf *elf, size_t max, size_t syms_ptr, void *ptr)
     Elf64_Sym   *sym;
     t_sym       syms[max];
     char        *name;
-    size_t      i;
+    int         i;
     size_t      nb_syms;
 
     nb_syms = 0;
-    i = 0;
-    while (i < max)
+    i = -1;
+    while (++i < max)
     {
         sym = &((Elf64_Sym *)(syms_ptr))[i];
         name = (char *)ptr + sym->st_name;
@@ -85,7 +85,6 @@ void    displaySym64(t_elf *elf, size_t max, size_t syms_ptr, void *ptr)
                     &elf->shstrtab[G_SHDR64[sym->st_shndx].sh_name]));
             ++nb_syms;
         }
-        ++i;
     }
     dumpSym64(syms, nb_syms);
 }
