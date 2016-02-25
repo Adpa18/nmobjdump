@@ -1,16 +1,16 @@
 /*
-** sym64.c for PSU_2015_nmobjdump
+** sym32.c for PSU_2015_nmobjdump
 **
 ** Made by	Adrien WERY
 ** Login	wery_a
 **
 ** Started on	Mon Feb 22 21:47:49 2016 Adrien WERY
-** Last update	Thu Feb 25 11:56:50 2016 Adrien WERY
+** Last update	Thu Feb 25 11:57:03 2016 Adrien WERY
 */
 
 #include "elfi.h"
 
-char    getSectionType(Elf64_Shdr *st, char *name)
+char    getSectionType(Elf32_Shdr *st, char *name)
 {
     R_CUSTOM(st->sh_flags & SHF_EXECINSTR, 't');
     R_CUSTOM(st->sh_flags & SHF_EXECINSTR, 't');
@@ -46,24 +46,24 @@ char    getSectionType(Elf64_Shdr *st, char *name)
     return ('?');
 }
 
-char    getSymType(Elf64_Sym *sym)
+char    getSymType(Elf32_Sym *sym)
 {
     if (sym->st_shndx == SHN_UNDEF)
     {
-        R_CUSTOM(ELF64_ST_BIND(sym->st_info) != STB_WEAK, 'U');
-        R_CUSTOM(ELF64_ST_TYPE(sym->st_info) == STT_OBJECT, GLOBAL('v'));
+        R_CUSTOM(ELF32_ST_BIND(sym->st_info) != STB_WEAK, 'U');
+        R_CUSTOM(ELF32_ST_TYPE(sym->st_info) == STT_OBJECT, GLOBAL('v'));
         return (GLOBAL('w'));
     }
     R_CUSTOM(sym->st_shndx == SHN_ABS, GLOBAL('a'));
     R_CUSTOM(sym->st_shndx == SHN_COMMON, 'C');
-    R_CUSTOM(ELF64_ST_TYPE(sym->st_info) == STT_GNU_IFUNC, 'i');
-    R_CUSTOM(ELF64_ST_TYPE(sym->st_info) == (1 << 13), 'I');
-    R_CUSTOM(ELF64_ST_BIND(sym->st_info) == STB_WEAK, 'W');
-    R_CUSTOM(ELF64_ST_TYPE(sym->st_info) == STT_FUNC, GLOBAL('t'));
+    R_CUSTOM(ELF32_ST_TYPE(sym->st_info) == STT_GNU_IFUNC, 'i');
+    R_CUSTOM(ELF32_ST_TYPE(sym->st_info) == (1 << 13), 'I');
+    R_CUSTOM(ELF32_ST_BIND(sym->st_info) == STB_WEAK, 'W');
+    R_CUSTOM(ELF32_ST_TYPE(sym->st_info) == STT_FUNC, GLOBAL('t'));
     return ('?');
 }
 
-void    dumpSym64(t_sym *syms, size_t nb_syms)
+void    dumpSym32(t_sym *syms, size_t nb_syms)
 {
     size_t  i;
 
@@ -72,16 +72,16 @@ void    dumpSym64(t_sym *syms, size_t nb_syms)
     while (i < nb_syms)
     {
         if (syms[i].value)
-            printf(DUMPSYM64, syms[i].value, syms[i].type, syms[i].name);
+            printf(DUMPSYM32, (int)syms[i].value, syms[i].type, syms[i].name);
         else
-            printf(DUMPSYMNS64, syms[i].type, syms[i].name);
+            printf(DUMPSYMNS32, syms[i].type, syms[i].name);
         ++i;
     }
 }
 
-void    displaySym64(t_elf *elf, size_t max, size_t syms_ptr, void *ptr)
+void    displaySym32(t_elf *elf, size_t max, size_t syms_ptr, void *ptr)
 {
-    Elf64_Sym   *sym;
+    Elf32_Sym   *sym;
     t_sym       syms[max];
     char        *name;
     size_t      i;
@@ -91,38 +91,38 @@ void    displaySym64(t_elf *elf, size_t max, size_t syms_ptr, void *ptr)
     i = 0;
     while (i < max)
     {
-        sym = &((Elf64_Sym *)(syms_ptr))[i];
+        sym = &((Elf32_Sym *)(syms_ptr))[i];
         name = (char *)ptr + sym->st_name;
         if (sym->st_shndx != SHN_ABS && name[0] != '\0')
         {
             syms[nb_syms].name = name;
             syms[nb_syms].value = (sym->st_shndx == SHN_UNDEF)?0:sym->st_value;
             if ((syms[nb_syms].type = getSymType(sym)) == '?')
-                syms[nb_syms].type = GLOBAL(getSectionType(&G_SHDR64[sym->st_shndx],
-                        &elf->shstrtab[G_SHDR64[sym->st_shndx].sh_name]));
+                syms[nb_syms].type = GLOBAL(getSectionType(&G_SHDR32[sym->st_shndx],
+                        &elf->shstrtab[G_SHDR32[sym->st_shndx].sh_name]));
             ++nb_syms;
         }
         ++i;
     }
-    dumpSym64(syms, nb_syms);
+    dumpSym32(syms, nb_syms);
 }
 
-void    display64(t_elf *elf)
+void    display32(t_elf *elf)
 {
-    Elf64_Ehdr  *Ehdr;
+    Elf32_Ehdr  *Ehdr;
     size_t      i;
 
     Ehdr = elf->data;
     elf->Shdr = elf->data + Ehdr->e_shoff;
-    elf->shstrtab = elf->data + G_SHDR64[Ehdr->e_shstrndx].sh_offset;
+    elf->shstrtab = elf->data + G_SHDR32[Ehdr->e_shstrndx].sh_offset;
     i = 0;
     while (i < Ehdr->e_shnum)
     {
-        if (G_SHDR64[i].sh_type == SHT_SYMTAB)
+        if (G_SHDR32[i].sh_type == SHT_SYMTAB)
         {
-            displaySym64(elf, G_SHDR64[i].sh_size / G_SHDR64[i].sh_entsize,
-                (size_t)elf->data + G_SHDR64[i].sh_offset,
-                elf->data + G_SHDR64[G_SHDR64[i].sh_link].sh_offset);
+            displaySym32(elf, G_SHDR32[i].sh_size / G_SHDR32[i].sh_entsize,
+                (size_t)elf->data + G_SHDR32[i].sh_offset,
+                elf->data + G_SHDR32[G_SHDR32[i].sh_link].sh_offset);
 
         }
         ++i;

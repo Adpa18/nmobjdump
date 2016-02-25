@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Wed Feb 17 00:48:10 2016 Adrien WERY
-** Last update	Wed Feb 24 23:14:14 2016 Adrien WERY
+** Last update	Thu Feb 25 11:54:40 2016 Adrien WERY
 */
 
 #include <stdio.h>
@@ -17,7 +17,10 @@ void    display(char *s)
 
     if (!(initElf(&elf, s)))
         return;
-    display64(&elf);
+    if (elf.type == ELFCLASS64)
+        display64(&elf);
+    else
+        display32(&elf);
     closeFile(&elf);
 }
 
