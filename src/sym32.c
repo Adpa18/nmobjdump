@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Mon Feb 22 21:47:49 2016 Adrien WERY
-** Last update	Thu Feb 25 13:41:18 2016 Adrien WERY
+** Last update	Thu Feb 25 16:09:30 2016 Adrien WERY
 */
 
 #include "elfi.h"
@@ -88,26 +88,4 @@ void    displaySym32(t_elf *elf, size_t max, size_t syms_ptr, void *ptr)
         ++i;
     }
     dumpSym32(syms, nb_syms);
-}
-
-void    display32(t_elf *elf)
-{
-    Elf32_Ehdr  *Ehdr;
-    size_t      i;
-
-    Ehdr = elf->data;
-    elf->Shdr = elf->data + Ehdr->e_shoff;
-    elf->shstrtab = elf->data + G_SHDR32[Ehdr->e_shstrndx].sh_offset;
-    i = 0;
-    while (i < Ehdr->e_shnum)
-    {
-        if (G_SHDR32[i].sh_type == SHT_SYMTAB)
-        {
-            displaySym32(elf, G_SHDR32[i].sh_size / G_SHDR32[i].sh_entsize,
-                (size_t)elf->data + G_SHDR32[i].sh_offset,
-                elf->data + G_SHDR32[G_SHDR32[i].sh_link].sh_offset);
-
-        }
-        ++i;
-    }
 }

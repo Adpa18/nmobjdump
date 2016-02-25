@@ -5,11 +5,54 @@
 ** Login	wery_a
 **
 ** Started on	Wed Feb 17 00:48:10 2016 Adrien WERY
-** Last update	Thu Feb 25 13:44:56 2016 Adrien WERY
+** Last update	Thu Feb 25 16:10:20 2016 Adrien WERY
 */
 
-#include <stdio.h>
 #include "elfi.h"
+
+void    display32(t_elf *elf)
+{
+    Elf32_Ehdr  *Ehdr;
+    size_t      i;
+
+    Ehdr = elf->data;
+    elf->Shdr = elf->data + Ehdr->e_shoff;
+    elf->shstrtab = elf->data + G_SHDR32[Ehdr->e_shstrndx].sh_offset;
+    i = 0;
+    while (i < Ehdr->e_shnum)
+    {
+        if (G_SHDR32[i].sh_type == SHT_SYMTAB)
+        {
+            displaySym32(elf, G_SHDR32[i].sh_size / G_SHDR32[i].sh_entsize,
+                (size_t)elf->data + G_SHDR32[i].sh_offset,
+                elf->data + G_SHDR32[G_SHDR32[i].sh_link].sh_offset);
+
+        }
+        ++i;
+    }
+}
+
+void    display64(t_elf *elf)
+{
+    Elf64_Ehdr  *Ehdr;
+    size_t      i;
+
+    Ehdr = elf->data;
+    elf->Shdr = elf->data + Ehdr->e_shoff;
+    elf->shstrtab = elf->data + G_SHDR64[Ehdr->e_shstrndx].sh_offset;
+    i = 0;
+    while (i < Ehdr->e_shnum)
+    {
+        if (G_SHDR64[i].sh_type == SHT_SYMTAB)
+        {
+            displaySym64(elf, G_SHDR64[i].sh_size / G_SHDR64[i].sh_entsize,
+                (size_t)elf->data + G_SHDR64[i].sh_offset,
+                elf->data + G_SHDR64[G_SHDR64[i].sh_link].sh_offset);
+
+        }
+        ++i;
+    }
+}
 
 void    display(char *s)
 {

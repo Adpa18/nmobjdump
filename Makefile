@@ -4,14 +4,15 @@ RM	=	rm -rf
 
 CFLAGS		= -W -Wall -Wextra -Werror -I./inc
 
-SRC			=	src/file.c	\
-				src/sym32.c	\
-				src/sym64.c	\
+SRC			=	src/file.c		\
+				src/sym32.c		\
+				src/sym64.c		\
 				src/elf.c
 
 SRC_NM		=	nm/main.c
 
-SRC_OBJDUMP	=
+SRC_OBJDUMP	=	objdump/main.c	\
+				objdump/dump.c	\
 
 SRC_NM		+= $(SRC)
 

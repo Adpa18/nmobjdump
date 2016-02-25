@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Mon Feb 22 21:47:49 2016 Adrien WERY
-** Last update	Thu Feb 25 15:27:42 2016 Adrien WERY
+** Last update	Thu Feb 25 16:09:43 2016 Adrien WERY
 */
 
 #include "elfi.h"
@@ -87,26 +87,4 @@ void    displaySym64(t_elf *elf, int max, size_t syms_ptr, void *ptr)
         }
     }
     dumpSym64(syms, nb_syms);
-}
-
-void    display64(t_elf *elf)
-{
-    Elf64_Ehdr  *Ehdr;
-    size_t      i;
-
-    Ehdr = elf->data;
-    elf->Shdr = elf->data + Ehdr->e_shoff;
-    elf->shstrtab = elf->data + G_SHDR64[Ehdr->e_shstrndx].sh_offset;
-    i = 0;
-    while (i < Ehdr->e_shnum)
-    {
-        if (G_SHDR64[i].sh_type == SHT_SYMTAB)
-        {
-            displaySym64(elf, G_SHDR64[i].sh_size / G_SHDR64[i].sh_entsize,
-                (size_t)elf->data + G_SHDR64[i].sh_offset,
-                elf->data + G_SHDR64[G_SHDR64[i].sh_link].sh_offset);
-
-        }
-        ++i;
-    }
 }
