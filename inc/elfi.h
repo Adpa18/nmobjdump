@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Wed Feb 17 01:19:21 2016 Adrien WERY
-** Last update	Thu Feb 25 13:57:51 2016 Adrien WERY
+** Last update	Thu Feb 25 15:18:32 2016 Adrien WERY
 */
 
 #ifndef ELFI_H
@@ -25,6 +25,7 @@
 # define LOWER(x) ((x >= 'A' && x <= 'Z') ? x - 'A' + 'a' : x)
 # define R_CUSTOM(x, y) if (x) {return (y);}
 # define GLOBAL(x) ((ELF64_ST_BIND(sym->st_info) == STB_GLOBAL) ? x - 32 : x)
+# define GLOBAL_ST(x) ((ELF64_ST_BIND(st_info) == STB_GLOBAL) ? x - 32 : x)
 # define G_SHDR64 ((Elf64_Shdr *)(elf->Shdr))
 # define G_SHDR32 ((Elf32_Shdr *)(elf->Shdr))
 
@@ -57,5 +58,6 @@ void    display64(t_elf *elf);
 void    display32(t_elf *elf);
 int     compare(const void *s1, const void *s2);
 char    getType(char *name);
-
+char    getSymType(uint16_t st_shndx, unsigned char st_info);
+char    getSectionType(uint32_t sh_flags, uint32_t sh_type, char *name);
 #endif /* !ELFI_H */

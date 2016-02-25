@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Mon Feb 22 21:47:49 2016 Adrien WERY
-** Last update	Thu Feb 25 13:59:16 2016 Adrien WERY
+** Last update	Thu Feb 25 15:27:42 2016 Adrien WERY
 */
 
 #include "elfi.h"
@@ -60,7 +60,7 @@ void    dumpSym64(t_sym *syms, size_t nb_syms)
     }
 }
 
-void    displaySym64(t_elf *elf, size_t max, size_t syms_ptr, void *ptr)
+void    displaySym64(t_elf *elf, int max, size_t syms_ptr, void *ptr)
 {
     Elf64_Sym   *sym;
     t_sym       syms[max];
