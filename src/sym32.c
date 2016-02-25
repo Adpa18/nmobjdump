@@ -5,12 +5,12 @@
 ** Login	wery_a
 **
 ** Started on	Mon Feb 22 21:47:49 2016 Adrien WERY
-** Last update	Thu Feb 25 11:57:03 2016 Adrien WERY
+** Last update	Thu Feb 25 13:32:01 2016 Adrien WERY
 */
 
 #include "elfi.h"
 
-char    getSectionType(Elf32_Shdr *st, char *name)
+char    getSectionType32(Elf32_Shdr *st, char *name)
 {
     R_CUSTOM(st->sh_flags & SHF_EXECINSTR, 't');
     R_CUSTOM(st->sh_flags & SHF_EXECINSTR, 't');
@@ -46,7 +46,7 @@ char    getSectionType(Elf32_Shdr *st, char *name)
     return ('?');
 }
 
-char    getSymType(Elf32_Sym *sym)
+char    getSymType32(Elf32_Sym *sym)
 {
     if (sym->st_shndx == SHN_UNDEF)
     {
@@ -72,9 +72,10 @@ void    dumpSym32(t_sym *syms, size_t nb_syms)
     while (i < nb_syms)
     {
         if (syms[i].value)
-            printf(DUMPSYM32, (int)syms[i].value, syms[i].type, syms[i].name);
+            printf("%08x %c %s\n", (int)syms[i].value,
+                syms[i].type, syms[i].name);
         else
-            printf(DUMPSYMNS32, syms[i].type, syms[i].name);
+            printf("         %c %s\n", syms[i].type, syms[i].name);
         ++i;
     }
 }
@@ -97,8 +98,8 @@ void    displaySym32(t_elf *elf, size_t max, size_t syms_ptr, void *ptr)
         {
             syms[nb_syms].name = name;
             syms[nb_syms].value = (sym->st_shndx == SHN_UNDEF)?0:sym->st_value;
-            if ((syms[nb_syms].type = getSymType(sym)) == '?')
-                syms[nb_syms].type = GLOBAL(getSectionType(&G_SHDR32[sym->st_shndx],
+            if ((syms[nb_syms].type = getSymType32(sym)) == '?')
+                syms[nb_syms].type = GLOBAL(getSectionType32(&G_SHDR32[sym->st_shndx],
                         &elf->shstrtab[G_SHDR32[sym->st_shndx].sh_name]));
             ++nb_syms;
         }

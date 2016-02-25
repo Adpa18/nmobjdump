@@ -5,6 +5,7 @@ RM	=	rm -rf
 CFLAGS		= -W -Wall -Wextra -Werror -I./inc
 
 SRC			=	src/file.c	\
+				src/sym32.c	\
 				src/sym64.c	\
 				src/elf.c
 

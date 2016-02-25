@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Wed Feb 17 01:19:21 2016 Adrien WERY
-** Last update	Thu Feb 25 11:56:48 2016 Adrien WERY
+** Last update	Thu Feb 25 12:01:11 2016 Adrien WERY
 */
 
 #ifndef ELFI_H
@@ -21,12 +21,6 @@
 # include <stdio.h>
 # include <locale.h>
 
-# define DUMPSYM64 "%016lx %c %s\n"
-# define DUMPSYM32 "%08x %c %s\n"
-# define DUMPSYMNS64 "                 %c %s\n"
-# define DUMPSYMNS32 "         %c %s\n"
-
-# define x64(type, x, y) ((type == ELFCLASS64) ? x : y)
 # define OVER(x) (((void*)(x) > elf->data + elf->size) ? true : false)
 # define LOWER(x) ((x >= 'A' && x <= 'Z') ? x - 'A' + 'a' : x)
 # define R_CUSTOM(x, y) if (x) {return (y);}

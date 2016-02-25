@@ -5,12 +5,12 @@
 ** Login	wery_a
 **
 ** Started on	Mon Feb 22 21:47:49 2016 Adrien WERY
-** Last update	Thu Feb 25 11:56:50 2016 Adrien WERY
+** Last update	Thu Feb 25 13:31:03 2016 Adrien WERY
 */
 
 #include "elfi.h"
 
-char    getSectionType(Elf64_Shdr *st, char *name)
+char    getSectionType64(Elf64_Shdr *st, char *name)
 {
     R_CUSTOM(st->sh_flags & SHF_EXECINSTR, 't');
     R_CUSTOM(st->sh_flags & SHF_EXECINSTR, 't');
@@ -46,7 +46,7 @@ char    getSectionType(Elf64_Shdr *st, char *name)
     return ('?');
 }
 
-char    getSymType(Elf64_Sym *sym)
+char    getSymType64(Elf64_Sym *sym)
 {
     if (sym->st_shndx == SHN_UNDEF)
     {
@@ -72,9 +72,9 @@ void    dumpSym64(t_sym *syms, size_t nb_syms)
     while (i < nb_syms)
     {
         if (syms[i].value)
-            printf(DUMPSYM64, syms[i].value, syms[i].type, syms[i].name);
+            printf("%016lx %c %s\n", syms[i].value, syms[i].type, syms[i].name);
         else
-            printf(DUMPSYMNS64, syms[i].type, syms[i].name);
+            printf("                 %c %s\n", syms[i].type, syms[i].name);
         ++i;
     }
 }
@@ -97,8 +97,8 @@ void    displaySym64(t_elf *elf, size_t max, size_t syms_ptr, void *ptr)
         {
             syms[nb_syms].name = name;
             syms[nb_syms].value = (sym->st_shndx == SHN_UNDEF)?0:sym->st_value;
-            if ((syms[nb_syms].type = getSymType(sym)) == '?')
-                syms[nb_syms].type = GLOBAL(getSectionType(&G_SHDR64[sym->st_shndx],
+            if ((syms[nb_syms].type = getSymType64(sym)) == '?')
+                syms[nb_syms].type = GLOBAL(getSectionType64(&G_SHDR64[sym->st_shndx],
                         &elf->shstrtab[G_SHDR64[sym->st_shndx].sh_name]));
             ++nb_syms;
         }
