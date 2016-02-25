@@ -5,15 +5,24 @@
 ** Login	wery_a
 **
 ** Started on	Thu Feb 25 15:30:06 2016 Adrien WERY
-** Last update	Thu Feb 25 18:33:47 2016 Adrien WERY
+** Last update	Thu Feb 25 23:38:35 2016 Adrien WERY
 */
 
 #include <stdio.h>
 #include "elfi.h"
 
-bool    checkType(size_t type, size_t flags)
+bool    checkType(size_t type, size_t flags, char *name, size_t e_type)
 {
-    return ((type != SHT_NULL && type != SHT_NOBITS && type != SHT_STRTAB
+    static bool sh = true;
+
+    R_CUSTOM(!name, false);
+    if (e_type == ET_DYN && sh && !strcmp(".shstrtab", name))
+    {
+        sh = false;
+        return (true);
+    }
+    return ((type != SHT_NULL && type != SHT_NOBITS
+        && type != SHT_STRTAB
         && type != SHT_SYMTAB && type != SHT_RELA)
         || (type == SHT_STRTAB && flags & SHF_ALLOC)
         ||  (type == SHT_RELA && flags & SHF_ALLOC));
@@ -31,8 +40,8 @@ void    display64(t_elf *elf)
     i = 0;
     while (i < Ehdr->e_shnum)
     {
-        if (checkType(G_SHDR64[i].sh_type, G_SHDR64[i].sh_flags)
-        && (name = &elf->shstrtab[G_SHDR64[i].sh_name])
+        if (checkType(G_SHDR64[i].sh_type, G_SHDR64[i].sh_flags,
+            (name = &elf->shstrtab[G_SHDR64[i].sh_name]), Ehdr->e_type)
         && G_SHDR64[i].sh_size > 0)
         {
             printf("Contents of section %s:\n", name);
@@ -55,8 +64,8 @@ void    display32(t_elf *elf)
     i = 0;
     while (i < Ehdr->e_shnum)
     {
-        if (checkType(G_SHDR32[i].sh_type, G_SHDR32[i].sh_flags)
-        && (name = &elf->shstrtab[G_SHDR32[i].sh_name])
+        if (checkType(G_SHDR32[i].sh_type, G_SHDR32[i].sh_flags,
+        (name = &elf->shstrtab[G_SHDR32[i].sh_name]), Ehdr->e_type)
         && G_SHDR32[i].sh_size > 0)
         {
             printf("Contents of section %s:\n", name);

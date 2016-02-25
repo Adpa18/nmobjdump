@@ -5,31 +5,49 @@
 ** Login	wery_a
 **
 ** Started on	Thu Feb 25 16:39:36 2016 Adrien WERY
-** Last update	Thu Feb 25 18:34:36 2016 Adrien WERY
+** Last update	Thu Feb 25 23:42:20 2016 Adrien WERY
 */
 
 #include "elfi.h"
 
+size_t  hexLength(int value)
+{
+    int len;
+
+    len = 1;
+    while (value > 15)
+    {
+        ++len;
+        value /= 16;
+    }
+  return (len);
+}
+
 void    dumpLine(unsigned char *data, size_t size)
 {
     size_t  i;
-    size_t  j;
-    char    ascii[BPL + 1];
-    char    octet[4 * (BPL + 1)];
-
-    memset(ascii, 0, BPL + 1);
     i = 0;
-    j = 0;
-    while (i < size)
+    while (i < BPL)
      {
-         ascii[i] = isprint(data[i]) ? data[i] : '.';
-         if (i % 4 == 0 && i != 0)
-            octet[j++] = ' ';
-         sprintf(&(octet[j]), "%02x", data[i]);
-         j += 2;
+         if (i < size)
+            printf("%02x", (unsigned) (data[i]));
+        else
+            printf("  ");
+        if ((i & 3) == 3)
+            printf(" ");
          ++i;
      }
-     printf("%-36s %-16s\n", octet, ascii);
+     printf(" ");
+     i = 0;
+     while (i < BPL)
+     {
+         if (i < size)
+            printf("%c", isprint(data[i]) ? data[i] : '.');
+   	    else
+            printf(" ");
+        ++i;
+     }
+     printf("\n");
 }
 
 void    dumpMem(void *data, size_t size, size_t start_addr)
@@ -37,13 +55,15 @@ void    dumpMem(void *data, size_t size, size_t start_addr)
     size_t  i;
     size_t  div;
     size_t  nb_lines;
+    static char    format[7] = " %04lx ";
 
     i = 0;
     div = (size / BPL);
     nb_lines = div + ((size % BPL > 0) ? 1 : 0);
+    format[3] = (MAX(4, hexLength(start_addr + size))) + 48;
     while (i < nb_lines)
     {
-        printf(" %04lx ", start_addr + (i * BPL));
+        printf(format, start_addr + (i * BPL));
         dumpLine(data + (i * BPL), (i >= div) ? (size % BPL) : BPL);
         ++i;
     }
@@ -55,22 +75,20 @@ void    displayFlags(t_elf *elf)
     size_t  type;
 
     printf("%s:     file format %s\n", elf->name, GET_ARCH(elf->type));
+    start = X64(elf->type, G_EHDR64->e_entry, G_EHDR32->e_entry);
+    type = X64(elf->type, G_EHDR64->e_type, G_EHDR32->e_type);
     if (elf->type == ELFCLASS64)
-    {
-        start = ((Elf64_Ehdr*)elf->data)->e_entry;
-        type = ((Elf64_Ehdr*)elf->data)->e_type;
-    }
+        printf("architecture: i386:x86-64, flags ");
     else
-    {
-        start = ((Elf32_Ehdr*)elf->data)->e_entry;
-        type = ((Elf32_Ehdr*)elf->data)->e_type;
-    }
+        printf("architecture: i386, flags ");
     if (type == ET_NONE || type == ET_CORE)
-        printf(DYSFLAGS, 0x0, "", start);
+        printf("0x%08x:\n%s\n", 0x0, "");
     else if (type == ET_REL)
-        printf(DYSFLAGS, 0x11, "HAS_RELOC, HAS_SYMS", start);
+        printf("0x%08x:\n%s\n", 0x11, "HAS_RELOC, HAS_SYMS");
     else if (type == ET_EXEC)
-        printf(DYSFLAGS, 0x112, "EXEC_P, HAS_SYMS, D_PAGED", start);
+        printf("0x%08x:\n%s\n", 0x112, "EXEC_P, HAS_SYMS, D_PAGED");
     else if (type == ET_DYN)
-        printf(DYSFLAGS, 0x150, "HAS_SYMS, DYNAMIC, D_PAGED", start);
+        printf("0x%08x:\n%s\n", 0x150, "HAS_SYMS, DYNAMIC, D_PAGED");
+    X64(elf->type, printf("start address 0x%016lx\n", start),
+        printf("start address 0x%08lx\n", start));
 }
