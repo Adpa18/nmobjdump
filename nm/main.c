@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Wed Feb 17 00:48:10 2016 Adrien WERY
-** Last update	Thu Feb 25 16:10:20 2016 Adrien WERY
+** Last update	Tue Mar 08 22:21:24 2016 Adrien WERY
 */
 
 #include "elfi.h"
@@ -81,4 +81,5 @@ int     main(int ac, char **av)
     }
     if (i == 1)
         display("./a.out");
+    return (0);
 }

@@ -5,7 +5,7 @@
 ** Login	wery_a
 **
 ** Started on	Thu Feb 25 15:30:06 2016 Adrien WERY
-** Last update	Thu Feb 25 23:38:35 2016 Adrien WERY
+** Last update	Tue Mar 08 22:13:30 2016 Adrien WERY
 */
 
 #include <stdio.h>
@@ -99,4 +99,5 @@ int     main(int ac, char **av)
         display(av[i]);
     if (i == 1)
         display("./a.out");
+    return (0);
 }

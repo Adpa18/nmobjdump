@@ -2,7 +2,7 @@ CC	=	gcc
 
 RM	=	rm -rf
 
-CFLAGS		= -W -Wall -Wextra -Werror -I./inc
+CFLAGS		= -W -Wall -Wextra -Werror -I./inc -ansi
 
 SRC			=	src/file.c		\
 				src/sym32.c		\
